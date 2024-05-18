@@ -67,8 +67,13 @@ document.getElementById('Quantity').addEventListener("change", (e) => {
 const numberWithCommas = x => x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 async function fetchProducts() {
   const id = document.getElementById('product_rows').dataset['id'];
-  const discontinued = document.getElementById('Discontinued').checked ? "" : "/discontinued/false";
-  const { data: fetchedProducts } = await axios.get(`../../api/category/${id}/productWithAverageReview${discontinued}`);
+    const discontinued = document.getElementById('Discontinued').checked ? "includeDiscontinued/true" : "";
+
+    console.log("debugger", `../../api/category/${id}/productWithAverageReview/${discontinued}`);
+    
+    
+
+  const { data: fetchedProducts } = await axios.get(`../../api/category/${id}/productWithAverageReview/${discontinued}`);
   // console.log(fetchedProducts);
   let product_row = "";
   // console.log("fetchedProducts", fetchedProducts);

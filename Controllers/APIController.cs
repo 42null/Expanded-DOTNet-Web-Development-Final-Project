@@ -1,5 +1,7 @@
+using System.Reflection.Metadata.Ecma335;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ValueGeneration.Internal;
 
 
 
@@ -49,13 +51,14 @@ namespace Northwind.Controllers
         public IEnumerable<Product> GetByCategory(int CategoryId) => _dataContext.Products.Where(p => p.CategoryId == CategoryId).OrderBy(p => p.ProductName);
 
         [HttpGet, Route("api/category/{CategoryId}/product/discontinued/{discontinued}")]
+
         // returns all products in a specific category where discontinued = true/false
         public IEnumerable<Product> GetByCategoryDiscontinued(int CategoryId, bool discontinued) => _dataContext.Products.Where(p => p.CategoryId == CategoryId && p.Discontinued == discontinued).OrderBy(p => p.ProductName);
 
 
-        [HttpGet, Route("api/category/{CategoryId}/productWithAverageReview/discontinued/{discontinued}")]
-        public IEnumerable<ProductWithAverageRating> GetByCategoryProductWithRating(int CategoryId, bool discontinued){
-            return _dataContext.Products.Where(p => p.CategoryId == CategoryId && p.Discontinued == discontinued).OrderBy(p => p.ProductName)//.Where(p=> p.ProductId == 1)
+        [HttpGet, Route("api/category/{CategoryId}/productWithAverageReview/includeDiscontinued/{discontinued}")]
+        public IEnumerable<ProductWithAverageRating> GetByCategoryProductWithRatingWithDiscontinuedOption(int CategoryId, bool discontinued = false){
+            return _dataContext.Products.Where(p => p.CategoryId == CategoryId && (discontinued || !p.Discontinued)).OrderBy(p => p.ProductName)//.Where(p=> p.ProductId == 1)
             // https://learn.microsoft.com/en-us/dotnet/api/system.linq.enumerable.select?view=net-8.0
                 .Select(productWithoutRatingForPassthrough => new ProductWithAverageRating{
                     ProductId = productWithoutRatingForPassthrough.ProductId,
@@ -73,6 +76,12 @@ namespace Northwind.Controllers
                 });
                 // Can't use new {} when returning direct new ProductWithAverageRating(){} as "CS0834 - A lambda expression with a statement body cannot be converted to an expression tree."
         }
+
+        [HttpGet, Route("api/category/{CategoryId}/productWithAverageReview")]
+        public IEnumerable<ProductWithAverageRating> GetByCategoryProductWithRating(int CategoryId){
+            return GetByCategoryProductWithRatingWithDiscontinuedOption(CategoryId, false);
+        }
+
 
         [HttpGet, Route("api/category")]
         // returns all categories

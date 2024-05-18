@@ -174,3 +174,10 @@ button.accept-policy:hover {
 .toast-body {
     color: var(--text-color);
 }
+
+
+/* Put back orignal discontiunued display that was removed */
+.discontinued {
+    opacity: .5;
+    text-decoration: line-through;
+}
